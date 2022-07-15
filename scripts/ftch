@@ -1,0 +1,79 @@
+#!/bin/sh
+#
+# tiny fork of ufetch-macos
+# by saucesaft
+
+## INFO
+
+# user is already defined
+host="$(hostname)"
+os="$(sw_vers -productName) $(sw_vers -productVersion)"
+kernel="$(uname -sr)"
+uptime="$(uptime | awk -F, '{sub(".*up ",x,$1);print $1}' | sed -e 's/^[ \t]*//')"
+if command -v pkgin &> /dev/null; then
+	packages="$(pkgin list | wc -l)"
+elif command -v brew &> /dev/null; then
+	brew_packages="$(brew list | wc -l)"
+	cask_packages="$(brew cask list 2> /dev/null | wc -l)"
+	packages="$(( ${brew_packages} + ${cask_packages} ))"
+elif command -v port &> /dev/null; then
+	packages="$(port installed | wc -l)"
+else
+	packages='no package manager'
+fi
+packages="$(echo ${packages} | sed -e 's/^[ /t]*//')"
+shell="$(basename ${SHELL})"
+
+limit=1
+lastfm_api_key= # set your last.fm api key here
+user=saucesaft # my last.fm username
+
+track_resp="$(curl --silent --get \
+  --data-urlencode "api_key=${lastfm_api_key}" \
+  --data-urlencode "format=json" \
+  --data-urlencode "limit=${limit}" \
+  --data-urlencode "method=user.getrecenttracks" \
+  --data-urlencode "user=${user}" \
+  "http://ws.audioscrobbler.com/2.0")"
+
+track="$(echo $track_resp | jq -r '.recenttracks.track[0].name')"
+artist="$(echo $track_resp | jq -r '.recenttracks.track[0].artist["#text"]')"
+
+## DEFINE COLORS
+
+# probably don't change these
+bold="$(tput bold)"
+black="$(tput setaf 0)"
+red="$(tput setaf 1)"
+green="$(tput setaf 2)"
+yellow="$(tput setaf 3)"
+blue="$(tput setaf 4)"
+magenta="$(tput setaf 5)"
+cyan="$(tput setaf 6)"
+white="$(tput setaf 7)"
+reset="$(tput sgr0)"
+
+# you can change these
+lc="${reset}${bold}"		# labels
+nc="${reset}${bold}"		# user and hostname
+ic="${reset}"				# info
+c0="${reset}"				# first color
+
+## OUTPUT
+
+cat <<EOF
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⣤⣤⣤⣤⣶⣦⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⡿⠛⠉⠙⠛⠛⠛⠛⠻⢿⣿⣷⣤⡀--------------------------------------
+⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⠋⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⠈⢻⣿⣿⡄⠀⠀⠀⠀                                |
+⠀⠀⠀⠀⠀⠀⠀⣸⣿⡏⠀⠀⠀⣠⣶⣾⣿⣿⣿⠿⠿⠿⢿⣿⣿⣿⣄⠀⠀⠀ ${nc}${USER}${ic}@${nc}${host}${reset}  |
+⠀⠀⠀⠀⠀⠀⠀⣿⣿⠁⠀⠀⢰⣿⣿⣯⠁⠀⠀⠀⠀⠀⠀⠀⠈⠙⢿⣷⡄⠀ ${lc}OS:        ${ic}${os}${reset}          |
+⠀⠀⣀⣤⣴⣶⣶⣿⡟⠀⠀⠀⢸⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣷⠀ ${lc}UPTIME:    ${ic}${uptime}${reset}             |
+⠀⢰⣿⡟⠋⠉⣹⣿⡇⠀⠀⠀⠘⣿⣿⣿⣿⣷⣦⣤⣤⣤⣶⣶⣶⣶⣿⣿⣿⠀ ${lc}PACKAGES:  ${ic}${packages}${reset}                 |
+⠀⢸⣿⡇⠀⠀⣿⣿⡇⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠃  ${lc}SHELL:     ${ic}${shell}${reset}                 |
+⠀⣸⣿⡇⠀⠀⣿⣿⡇⠀⠀⠀⠀⠀⠉⠻⠿⣿⣿⣿⣿⡿⠿⠿⠛⢻⣿⡇⠀⠀ ${lc}MUSIC:     ${ic}${track} by ${artist}${reset}
+⠀⠸⣿⣧⡀⠀⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⠃                                  |
+⠀⠀⠛⢿⣿⣿⣿⣿⣇⠀⠀⠀⠀⠀⣰⣿⣿⣷⣶⣶⣶⣶⠶⠀⢠⣿⣿⠀⠀----------------------------------
+⠀⠀⠀⠀⠀⠀⠀⣿⣿⠀⠀⠀⠀⠀⣿⣿⡇⠀⣽⣿⡏⠁⠀⠀⢸⣿⡇⠀⠀⠀                                          
+⠀⠀⠀⠀⠀⠀⠀⣿⣿⠀⠀⠀⠀⠀⣿⣿⡇⠀⢹⣿⡆⠀⠀⠀⣸⣿⠇⠀⠀⠀                                          
+⠀⠀⠀⠀⠀⠀⠀⢿⣿⣦⣄⣀⣠⣴⣿⣿⠁⠀⠈⠻⣿⣿⣿⣿⡿⠏
+⠀⠀⠀⠀⠀⠀⠀⠈⠛⠻⠿⠿⠿⠿⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
