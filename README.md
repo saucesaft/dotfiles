@@ -1,3 +1,3 @@
-## sauceaft's dotfiles
+## saucesaft's dotfiles
 
 hi! welcome, enjoy :)
