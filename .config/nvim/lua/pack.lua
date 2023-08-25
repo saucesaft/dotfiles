@@ -25,19 +25,32 @@ packer.startup(function()
 	'nvim-lualine/lualine.nvim',
 	requires = { 'kyazdani42/nvim-web-devicons', opt = true }
     }
+
     use {
-	'levelone/tequila-sunrise.vim'
+	'nvim-tree/nvim-tree.lua',
+	requires = 'nvim-tree/nvim-web-devicons'
+    }
+
+    --- fzf
+    use {
+	'nvim-telescope/telescope.nvim', tag = '0.1.2',
+	requires = { {'nvim-lua/plenary.nvim'} }
     }
 
     use {
-	'akinsho/bufferline.nvim',
-	tag = "v2.*",
-	requires = 'kyazdani42/nvim-web-devicons'
-    }
+	'tom-anders/telescope-vim-bookmarks.nvim',
+	requires = { 'MattesGroeger/vim-bookmarks' }
+	}
 
+    --- lsp
     use {
-	'kyazdani42/nvim-tree.lua',
-	requires = 'kyazdani42/nvim-web-devicons'
+	'neovim/nvim-lspconfig',
+	}
+
+    --- when i dont want to code
+    use {
+	'eandrju/cellular-automaton.nvim',
+	requires = 'nvim-treesitter/nvim-treesitter'
     }
 
     use {
@@ -55,28 +68,59 @@ packer.startup(function()
 	'goolord/alpha-nvim',
 	requires = 'kyazdani42/nvim-web-devicons',
 	config = function ()
-	    require'alpha'.setup(require'alpha.themes.dashboard'.config)
+	    require('alpha').setup(require'alpha.themes.dashboard'.config)
 	end
     }
 
     use {
 	"mcchrish/zenbones.nvim",
-	-- Optionally install Lush. Allows for more configuration or extending the colorscheme
-	-- If you don't want to install lush, make sure to set g:zenbones_compat = 1
-	-- In Vim, compat mode is turned on as Lush only works in Neovim.
 	requires = "rktjmp/lush.nvim"
     }
 
     use {
-	"folke/which-key.nvim",
-	config = function()
-	require("which-key").setup {
-	    -- your configuration comes here
-	    -- or leave it empty to use the default settings
-	    -- refer to the configuration section below
-    	}
-  end
-}
+	"evanleck/vim-svelte",
+	requires = {"othree/html5.vim", "pangloss/vim-javascript"},
+	}
 
-    end
+    use "habamax/vim-rst"
+
+    -- colorscheme
+
+    use "morhetz/gruvbox"
+
+    -- jinja syntax
+    use "Glench/Vim-Jinja2-Syntax"
+
+    -- buffer line and managment
+
+    use 'famiu/bufdelete.nvim'
+
+    use {
+	'akinsho/bufferline.nvim',
+	tag = "v2.*",
+	requires = 'kyazdani42/nvim-web-devicons'
+    }
+
+    -- snippets and latex things
+
+    use {
+	"L3MON4D3/LuaSnip",
+	tag = "v<CurrentMajor>.*"
+    }
+
+    use 'lervag/vimtex'
+
+    use {
+      "iurimateus/luasnip-latex-snippets.nvim",
+      -- replace "lervag/vimtex" with "nvim-treesitter/nvim-treesitter" if you're
+      -- using treesitter.
+      requires = { "L3MON4D3/LuaSnip", "lervag/vimtex" },
+      config = function()
+	require'luasnip-latex-snippets'.setup()
+	-- or setup({ use_treesitter = true })
+      end,
+      ft = "tex",
+    }
+
+  end
 )

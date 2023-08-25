@@ -3,5 +3,5 @@ require('ui')
 require('config')
 require('keys')
 require('greet')
-
-require('Comment').setup()
+require('snips')
+require('lsp')

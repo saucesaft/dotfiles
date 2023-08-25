@@ -1,20 +1,24 @@
 vim.cmd[[
   set background=light
-  colorscheme rosebones
+  colorscheme gruvbox
 ]]
 
-require("bufferline").setup{
+require("bufferline").setup({
     options = {
-	modified_icon = ':v',
+	modified_icon = 'w',
 	close_icon = 'X',
 	show_buffer_icons = false,
     }
-}
+})
 
 require("nvim-tree").setup({
   sort_by = "case_sensitive",
   view = {
     adaptive_size = true,
+    width = {
+	max = 30,
+	min = 20,
+    },
     mappings = {
       list = {
         { key = "u", action = "dir_up" },
@@ -25,6 +29,9 @@ require("nvim-tree").setup({
     group_empty = true,
   },
 })
+
+-- close nvim-tree when it is the last window
+vim.g.nvim_tree_auto_close = 1
 
 local colors = {
   blue   = '#80a0ff',
@@ -37,3 +44,5 @@ local colors = {
 }
 
 require('lualine').setup {}
+
+vim.g.bookmark_sign = '>>'
