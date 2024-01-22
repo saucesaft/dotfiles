@@ -20,11 +20,34 @@ vim.opt.rtp:prepend(lazypath)
 --  You can also configure plugins after the setup call,
 --    as they will be available in your neovim runtime.
 require('lazy').setup({
+  { -- running nvim in a terminal that's inside of nvim will open the file in a new tab
+    "samjwill/nvim-unception",
+    init = function()
+      vim.g.unception_open_buffer_in_new_tab = true
+    end
+  },
+  {
+    'lervag/vimtex',
+  },
+  {'romgrk/barbar.nvim',
+    dependencies = {
+      'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
+      'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
+    },
+    init = function() vim.g.barbar_auto_setup = false end,
+    opts = {
+      -- lazy.nvim will automatically call setup for you. put your options here, anything missing will use the default:
+      -- animation = true,
+      -- insert_at_start = true,
+      -- …etc.
+    },
+    version = '^1.0.0', -- optional: only update when a new 1.x version is released
+  },
 
   {
     'goolord/alpha-nvim',
     dependencies = {
-      'kyazdani42/nvim-web-devicons',
+      'nvim-tree/nvim-web-devicons',
     },
     config = function()
       require('alpha').setup(require'alpha.themes.dashboard'.config)
@@ -232,6 +255,9 @@ vim.o.termguicolors = true
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+
+-- exit terminal mode with kj
+vim.keymap.set('t', 'kj', '<C-\\><C-n>', { noremap = true })
 
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -499,6 +525,14 @@ cmp.setup {
 
 -- change cursor back to normal when leaving neovim
 vim.cmd('au VimLeave * set guicursor=a:ver1-blinkon0')
+
+-- vimtex specific settings
+vim.g.tex_flavor = 'latex'
+vim.g.vimtex_view_method = 'skim'
+vim.g.vimtex_view_skim_sync = 1
+vim.g.vimtex_view_skim_activate = 1
+
+require('keys')
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
